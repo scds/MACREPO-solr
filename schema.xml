@@ -289,8 +289,6 @@
    <field name="mods.indexNote" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indextypeOfResource" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexSubject" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
-   <field name="mods.indexphysicalDescription" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
-   <field name="mods.indextypeOfResource" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexlanguage" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexoriginInfo" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexabstract" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
@@ -298,14 +296,12 @@
    <field name="mods.indexform" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexroleTerm" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indextopic" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
-   <field name="mods.indexgeographic" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexcountry" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexregion" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexpublisher" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexgeographic" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexrelatedItem" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="mods.indexphysicalLocation" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
-   <field name="macrepo.indexany" type="SimpleLiteral" abstract="true"/>
    <field name="macrepo.indextheme" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="macrepo.indexera" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <field name="macrepo.indexboxNumber" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
