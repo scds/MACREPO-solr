@@ -284,6 +284,77 @@
         alternately, change the type="ignored" to some other type e.g. "text" if you want 
         unknown fields indexed and/or stored by default --> 
    <field name="dc.description" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexphysicalDescription" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexTitle" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexNote" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indextypeOfResource" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexSubject" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexphysicalDescription" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indextypeOfResource" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexlanguage" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexoriginInfo" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexabstract" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexgenre" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexform" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexroleTerm" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indextopic" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexgeographic" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexcountry" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexregion" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexpublisher" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexgeographic" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexrelatedItem" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="mods.indexphysicalLocation" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexany" type="SimpleLiteral" abstract="true"/>
+   <field name="macrepo.indextheme" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexera" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexboxNumber" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexenvelopeNumber" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexeditionNumber" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexmapSheetReference" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexoblique" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexsubSeries" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexdateDigitized" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexpreservationNotes" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexdigitizationNotes" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexphotoReference" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexfileNumber" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexbertrandRussellNumber" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexlocation" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexunit" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexbiographicalNote" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexprisonerNumber" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexseriesName" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexseriesNumber" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexsheetNumber" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexmapID" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexdistanceHorizontal" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexdistanceVertical" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexsheetTitle" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexannotation" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexprisonerName" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexprisonBlock" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexsubCamp" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexdateDisplay" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indextaxonomyTerms" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexconcentrationCamp" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexpowCamp" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexgestapoCamp" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexinternmentCamp" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexspecialLabels" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexcensor" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexspecialCodes" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexpostmark" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexsender" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexrecipient" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexcaseStudy" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexsummary" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indextranscript" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indextranslation" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexoldNid" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexdateBaseMap" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexbaseMapProducer" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <field name="macrepo.indexdateOverPrint" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <dynamicField name="*" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    
  </fields>

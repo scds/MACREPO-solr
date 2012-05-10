@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <!-- $Id: demoFoxmlToLucene.xslt 5734 2006-11-28 11:20:15Z gertsp $ -->
 <xsl:stylesheet version="1.0"
-	        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"   
-    	        xmlns:exts="xalan://dk.defxws.fedoragsearch.server.GenericOperationsImpl"
-    	        xmlns:islandora-exts="xalan://ca.upei.roblib.DataStreamForXSLT"
-    		exclude-result-prefixes="exts islandora-exts"
+		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"   
+		xmlns:exts="xalan://dk.defxws.fedoragsearch.server.GenericOperationsImpl"
+		xmlns:islandora-exts="xalan://ca.upei.roblib.DataStreamForXSLT"
+		exclude-result-prefixes="exts islandora-exts"
 		xmlns:zs="http://www.loc.gov/zing/srw/"
 		xmlns:foxml="info:fedora/fedora-system:def/foxml#"
 		xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -16,18 +16,18 @@
 		xmlns:macrepo="http://repository.mcmaster.ca/schema/index.html"
 		xmlns:fedora-model="info:fedora/fedora-system:def/model#"
 		xmlns:fedora="info:fedora/fedora-system:def/relations-external#"
-                xmlns:uvalibdesc="http://dl.lib.virginia.edu/bin/dtd/descmeta/descmeta.dtd"
+				xmlns:uvalibdesc="http://dl.lib.virginia.edu/bin/dtd/descmeta/descmeta.dtd"
 		xmlns:uvalibadmin="http://dl.lib.virginia.edu/bin/admin/admin.dtd/">
 	<xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
 <!--
 	 This xslt stylesheet generates the Solr doc element consisting of field elements
-     from a FOXML record. The PID field is mandatory.
-     Options for tailoring:
-       - generation of fields from other XML metadata streams than DC
-       - generation of fields from other datastream types than XML
-         - from datastream by ID, text fetched, if mimetype can be handled
-             currently the mimetypes text/plain, text/xml, text/html, application/pdf can be handled.
+	 from a FOXML record. The PID field is mandatory.
+	 Options for tailoring:
+	   - generation of fields from other XML metadata streams than DC
+	   - generation of fields from other datastream types than XML
+		 - from datastream by ID, text fetched, if mimetype can be handled
+			 currently the mimetypes text/plain, text/xml, text/html, application/pdf can be handled.
 -->
 
 	<xsl:param name="REPOSITORYNAME" select="repositoryName"/>
@@ -78,951 +78,424 @@
 			
 		<!-- Full Text - OCR -->
 		<xsl:for-each select="foxml:datastream[@ID='OCR']/foxml:datastreamVersion[last()]">
-                  <field>
-                    <xsl:attribute name="name">
-                      <xsl:value-of select="concat('OCR.', 'OCR')"/>
-                    </xsl:attribute>
-                    <xsl:value-of select="islandora-exts:getDatastreamTextRaw($PID, $REPOSITORYNAME, 'OCR', $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)" />
-                  </field>
-                </xsl:for-each>
-		
-                <!-- field added for indexing only  -->
-        
-		<field>
-            	<xsl:attribute name="name">
-                	<xsl:value-of select="concat('mods.', 'indexTitle')"/>
-            	</xsl:attribute>
-            	<xsl:value-of select="//mods:title"/>
-       	 	</field>
-
-        	<xsl:variable name="pageCModel">
-            		<xsl:text>info:fedora/ilives:pageCModel</xsl:text>
-        	</xsl:variable>
-
-        	<xsl:variable name="thisCModel">
-            		<xsl:value-of select="//fedora-model:hasModel/@rdf:resource"/>
-        	</xsl:variable>
-        	<xsl:value-of select="$thisCModel"/>
-        
-			<!-- MODS Indexing -->
-	        </xsl:template>	
-		<xsl:template name="mods">
-        		<xsl:variable name="MODS_STREAM" select="islandora-exts:getXMLDatastreamASNodeList($PID, $REPOSITORYNAME, 'MODS', $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)"/>
-            
-		<xsl:for-each select="foxml:datastream[@ID='MODS']/foxml:datastreamVersion[last()]">
-            	<xsl:call-template name="mods"/>
-            	<!--only call this if the mods stream exists-->
-        	</xsl:for-each>
-        
-			<xsl:for-each select="$MODS_STREAM//mods:title">
-            <xsl:if test="text() [normalize-space(.) ]">
-                <!--don't bother with empty space-->
-                <field>
-                    <xsl:attribute name="name">
-                        <xsl:value-of select="concat('mods.', 'title')"/>
-                    </xsl:attribute>
-                    <xsl:value-of select="../mods:nonSort/text()"/>
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="text()"/>
-                </field>
-            </xsl:if>
-
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:subTitle">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'subTitle')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:abstract">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="text()"/>
-					</field>
-				</xsl:if>
-	
-	
-			</xsl:for-each>
-			<!--test of optimized version don't call normalize-space twice in this one-->
-			<xsl:for-each select="$MODS_STREAM//mods:genre">
-				<xsl:variable name="textValue" select="normalize-space(text())"/>
-				<xsl:if test="$textValue != ''">
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="$textValue"/>
-					</field>
-				</xsl:if>
-	
-	
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:form">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-	
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:roleTerm">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', text())"/>
-						</xsl:attribute>
-						<xsl:value-of select="../../mods:namePart/text()"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:note[@type='statement of responsibility']">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'sor')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:note">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'note')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:topic">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'topic')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:geographic">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'geographic')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:caption">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'caption')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-	
-	
-			<xsl:for-each select="$MODS_STREAM//mods:subject/*">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<!--changed names to have each child element uniquely indexed-->
-							<xsl:value-of select="concat('mods.', 'subject')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:extent">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'extent')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:accessCondition">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'accessCondition')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:country">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'country')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:province">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'province')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:county">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'county')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:region">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'region')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:city">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'city')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:citySection">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'citySection')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:subject/mods:name/mods:namePart/*">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'subject')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-	
-	
-			<xsl:for-each select="$MODS_STREAM//mods:physicalDescription/*">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:originInfo//mods:placeTerm[@type='text']">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'place_of_publication')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:originInfo/mods:publisher">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:originInfo/mods:edition">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:originInfo/mods:dateIssued">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-	
-			<xsl:for-each select="//mods:originInfo/mods:dateCreated">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:originInfo/mods:issuance">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-	
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:physicalLocation">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:for-each select="$MODS_STREAM//mods:identifier">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', name())"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-	
-			<xsl:for-each select="$MODS_STREAM//mods:detail[@type='page number']/mods:number">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('mods.', 'pageNum')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			</xsl:template>
-			<!-- END MODS -->
-			
-			<!-- MACREPO -->
-			<xsl:template name="macrepo">
-        	<xsl:variable name="MACREPO_STREAM" select="islandora-exts:getXMLDatastreamASNodeList($PID, $REPOSITORYNAME, 'MACREPO', $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)"/>
-
-			<xsl:for-each select="foxml:datastream[@ID='MACREPO']/foxml:datastreamVersion[last()]">
-            	<xsl:call-template name="macrepo"/>
-            	<!--only call this if the mods stream exists-->
-        	</xsl:for-each>
-        	
-        	<xsl:for-each select="$MACREPO_STREAM//macrepo:baseMapProducer">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'baseMapProducer')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>            
-            
-            <xsl:for-each select="$MACREPO_STREAM//macrepo:dateOverPrint">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'dateOverPrint')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each> 
-            
-            <xsl:for-each select="$MACREPO_STREAM//macrepo:dateBaseMap">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'dateBaseMap')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each> 
-			
-            <xsl:for-each select="$MACREPO_STREAM//macrepo:translation">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'translation')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			
-            <xsl:for-each select="$MACREPO_STREAM//macrepo:transcript">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'transcript')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			
-            <xsl:for-each select="$MACREPO_STREAM//macrepo:summary">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'summary')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-            <xsl:for-each select="$MACREPO_STREAM//macrepo:caseStudy">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'caseStudy')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-            <xsl:for-each select="$MACREPO_STREAM//macrepo:recipient">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'recipient')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>		
-			
-            <xsl:for-each select="$MACREPO_STREAM//macrepo:sender">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'sender')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>		
-			
-            <xsl:for-each select="$MACREPO_STREAM//macrepo:postmark">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'postmark')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>            
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:specialCodes">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'specialCodes')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>		
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:specialLabels">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'specialLabels')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:internmentCamp">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'internmentCamp')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>		
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:gestapoCamp">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'gestapoCamp')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:powCamp">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'powCamp')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:concentrationCamp">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'concentrationCamp')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:taxonomyTerms">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'taxonomyTerms')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:subCamp">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'subCamp')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:prisonBlock">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'prisonBlock')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:prisonerName">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'prisonerName')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:annotation">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'annotation')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:sheetTitle">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'sheetTitle')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:distanceVertical">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'distanceVertical')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:distanceHorizontal">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'distanceHorizontal')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:mapID">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'mapID')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:sheetNumber">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'sheetNumber')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:seriesNumber">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'seriesNumber')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:seriesName">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'seriesName')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:prisonerNumber">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'prisonerNumber')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:biographicalNote">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'biographicalNote')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:unit">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'unit')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:location">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'location')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:bertrandRussellNumber">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'bertrandRussellNumber')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:photoReference">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'photoReference')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:subSeries">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'subSeries')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:oblique">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'oblique')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:mapSheetReference">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'mapSheetReference')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:editionNumber">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'editionNumber')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:envelopeNumber">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'envelopeNumber')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>		
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:era">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'era')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>			
-			
-			<xsl:for-each select="$MACREPO_STREAM//macrepo:theme">
-				<xsl:if test="text() [normalize-space(.) ]">
-					<!--don't bother with empty space-->
-					<field>
-						<xsl:attribute name="name">
-							<xsl:value-of select="concat('macrepo.', 'theme')"/>
-						</xsl:attribute>
-						<xsl:value-of select="normalize-space(text())"/>
-					</field>
-				</xsl:if>
-			</xsl:for-each>	
-			<!-- END MACREPO -->
-			
-			<!-- a managed datastream is fetched, if its mimetype 
-			     can be handled, the text becomes the value of the field. -->
-			<xsl:for-each select="foxml:datastream[@CONTROL_GROUP='M']">
-				<field index="TOKENIZED" store="YES" termVector="NO">
+				  <field>
 					<xsl:attribute name="name">
-						<xsl:value-of select="concat('dsm.', @ID)"/>
+					  <xsl:value-of select="concat('OCR.', 'OCR')"/>
 					</xsl:attribute>
-					<xsl:value-of select="exts:getDatastreamText($PID, $REPOSITORYNAME, @ID, $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)"/>
-				</field>
-			</xsl:for-each>
+					<xsl:value-of select="exts:getDatastreamTextRaw($PID, $REPOSITORYNAME, 'OCR', $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)" />
+				  </field>
+				</xsl:for-each>
+		
+				<!-- field added for indexing only	-->
+		
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexTitle')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:title"/>
+			</field>
 			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexNote')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:note"/>
+			</field>			
+
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indextypeOfResource')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:typeOfResource"/>
+			</field>
+
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexSubject')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:subject"/>
+			</field>
+			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexphysicalDescription')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:physicalDescription"/>
+			</field>
+			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indextypeOfResource')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:typeOfResource"/>
+			</field>
+			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexlanguage')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:language"/>
+			</field>
+			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexoriginInfo')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:originInfo"/>
+			</field>			
+			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexabstract')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:abstract"/>
+			</field>
+						
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexgenre')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:genre"/>
+			</field>
+						
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexform')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:form"/>
+			</field>
+						
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexroleTerm')"/>
+				</xsl:attribute>
+				<xsl:value-of select="../../mods:namePart/text()"/>
+			</field>
+						
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indextopic')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:topic"/>
+			</field>
+						
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexgeographic')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:geographic"/>
+			</field>
+											
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexcountry')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:country"/>
+			</field>
+										
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexregion')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:region"/>
+			</field>
+									
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexpublisher')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:indexpublisher"/>
+			</field>
+									
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexgeographic')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:geographic"/>
+			</field>
+										
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexrelatedItem')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:relatedItem/titleInfo/title"/>
+			</field>		
+										
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('mods.', 'indexphysicalLocation')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//mods:physicalLocation"/>
+			</field>
+														
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexbaseMapProducer')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:baseMapProducer"/>
+			</field>	
+																
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexdateOverPrint')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:dateOverPrint"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexdateBaseMap')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:dateBaseMap"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indextranslation')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:translation"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indextranscript')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:transcript"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexcaseStudy')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:caseStudy"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexrecipient')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:recipient"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexsender')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:sender"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexspecialCodes')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:specialCodes"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexspecialLabels')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:specialLabels"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexinternmentCamp')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:internmentCamp"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexgestapoCamp')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:gestapoCamp"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexpowCamp')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:powCamp"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexconcentrationCamp')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:concentrationCamp"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indextaxonomyTerms')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:taxonomyTerms"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexsubCamp')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:baseMapProducer"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexprisonBlock')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:prisonBlock"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexprisonerName')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:prisonerName"/>
+			</field>
+																			
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexannotation')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:annotation"/>
+			</field>
+																								
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexsheetTitle')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:sheetTitle"/>
+			</field>
+																								
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexdistanceVertical')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:distanceVertical"/>
+			</field>
+																								
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexdistanceHorizontal')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:distanceHorizontal"/>
+			</field>
+																								
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexsheetNumber')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:sheetNumber"/>
+			</field>
+																								
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexseriesNumber')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:seriesNumber"/>
+			</field>
+																								
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexseriesName')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:seriesName"/>
+			</field>
+																								
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexprisonerNumber')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:prisonerNumber"/>
+			</field>
+																								
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexbiographicalNote')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:biographicalNote"/>
+			</field>
+																								
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexunit')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:unit"/>
+			</field>
+																										
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexbertrandRussellNumber')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:bertrandRussellNumber"/>
+			</field>
+																													
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexphotoReference')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:photoReference"/>
+			</field>
+																													
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexsubSeries')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:subSeries"/>
+			</field>
+																													
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexmapSheetReference')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:mapSheetReference"/>
+			</field>
+																													
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexoblique')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:oblique"/>
+			</field>
+																													
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexeditionNumber')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:editionNumber"/>
+			</field>
+																													
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexenvelopeNumber')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:envelopeNumber"/>
+			</field>
+																													
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indexera')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:era"/>
+			</field>
+																													
+			<field>
+				<xsl:attribute name="name">
+					<xsl:value-of select="concat('macrepo.', 'indextheme')"/>
+				</xsl:attribute>
+				<xsl:value-of select="//macrepo:theme"/>
+			</field>
+			
+			<xsl:variable name="pageCModel">
+					<xsl:text>info:fedora/ilives:pageCModel</xsl:text>
+			</xsl:variable>
+
+			<xsl:variable name="thisCModel">
+					<xsl:value-of select="//fedora-model:hasModel/@rdf:resource"/>
+			</xsl:variable>
+			<xsl:value-of select="$thisCModel"/>		
+	
 	</xsl:template>
-	<!--
-	<xsl:template match="*" mode="simple_set">
-		<xsl:param name="prefix">mods</xsl:param>
-		<xsl:param name="suffix"></xsl:param>
-		<field>
-			<xsl:attribute name="name">
-				<xsl:value-of select="contact($prefix, local-name(), $suffix)"/>
-			</xsl:attribute>
-			<xsl:value-of select="text()"/>
-		</field>
-	</xsl:template>
-	-->
+
 </xsl:stylesheet>	
